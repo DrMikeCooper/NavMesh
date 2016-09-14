@@ -9,6 +9,7 @@ public class MouseFollow : MonoBehaviour {
     public Material noLinkMaterial;
     PointSequence currentPoints = null;
     int currentIndex = 0;
+    bool backwards;
 
     // Use this for initialization
     void Start () {
@@ -24,8 +25,10 @@ public class MouseFollow : MonoBehaviour {
             mr.material = linkMaterial;
             if (currentPoints == null)
             {
+                Vector3 pos = nv.currentOffMeshLinkData.startPos;
                 currentPoints = nv.currentOffMeshLinkData.offMeshLink.endTransform.GetComponent<PointSequence>();
-                currentIndex = 0;
+                backwards = (pos != currentPoints.allPoints[0].position);
+                currentIndex = backwards ? currentPoints.allPoints.Length - 1 : 0;
             }
         }
         else
@@ -38,20 +41,35 @@ public class MouseFollow : MonoBehaviour {
         {
             // at the end, we want to return to the NavMesh
             Transform from = currentPoints.allPoints[currentIndex];
-            Transform target = currentPoints.allPoints[currentIndex+1];
+            Transform target = currentPoints.allPoints[backwards ? currentIndex-1 : currentIndex+1];
 
             Vector3 pos = transform.position;
             pos = Vector3.MoveTowards(pos, target.position, 0.1f);
             if ((pos - target.position).magnitude < 0.05f)
             {
-                if (currentIndex >= currentPoints.allPoints.Length - 2)
+                if (!backwards)
                 {
-                    currentPoints = null;
-                    nv.CompleteOffMeshLink();
+                    if (currentIndex >= currentPoints.allPoints.Length - 2)
+                    {
+                        currentPoints = null;
+                        nv.CompleteOffMeshLink();
+                    }
+                    else
+                    {
+                        currentIndex++;
+                    }
                 }
                 else
                 {
-                    currentIndex++;
+                    if (currentIndex <= 1)
+                    {
+                        currentPoints = null;
+                        nv.CompleteOffMeshLink();
+                    }
+                    else
+                    {
+                        currentIndex--;
+                    }
                 }
             }
 
