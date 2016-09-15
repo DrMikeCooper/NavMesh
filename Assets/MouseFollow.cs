@@ -37,8 +37,14 @@ public class MouseFollow : MonoBehaviour {
             {
                 Vector3 pos = nv.currentOffMeshLinkData.startPos;
                 currentPoints = nv.currentOffMeshLinkData.offMeshLink.endTransform.GetComponent<PointSequence>();
-                backwards = (pos != currentPoints.allPoints[0].position);
-                currentIndex = backwards ? currentPoints.allPoints.Length - 1 : 0;
+                if (currentPoints != null)
+                {
+                    backwards = (pos != currentPoints.allPoints[0].position);
+                    currentIndex = backwards ? currentPoints.allPoints.Length - 1 : 0;
+                }
+                else
+                    nv.CompleteOffMeshLink();
+
             }
         }
         else
