@@ -11,11 +11,21 @@ public class MouseFollow : MonoBehaviour {
     int currentIndex = 0;
     bool backwards;
 
+    public AudioClip clip;
+
+    public string clip2Name;
+    private AudioClip clip2;
+
+    Vector3? targetPoint = null;
+    AudioSource source;
+
     // Use this for initialization
     void Start () {
         nv = GetComponent<NavMeshAgent>();
         mr = GetComponent<MeshRenderer>();
-	}
+        clip2 = new AudioClip();
+        source = GetComponent<AudioSource>();
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -77,6 +87,12 @@ public class MouseFollow : MonoBehaviour {
 
         }
 
+        //if (targetPoint != null && !source.isPlaying)
+        //{
+        //    nv.SetDestination(targetPoint.Value);
+        //    targetPoint = null;
+        //}
+
         bool touch = false;
         Vector3 mousepos = new Vector3(0, 0, 0);
 
@@ -93,6 +109,7 @@ public class MouseFollow : MonoBehaviour {
             mousepos = Input.mousePosition;
         }
 #endif
+
         if (!touch)
             return;
 
@@ -100,9 +117,10 @@ public class MouseFollow : MonoBehaviour {
         RaycastHit hitInfo = new RaycastHit();
         if (Physics.Raycast(ray, out hitInfo))
         {
+            source.clip = Resources.Load<AudioClip>(clip2Name);
+            source.Play();
+            //targetPoint = hitInfo.point;
             nv.SetDestination(hitInfo.point);
         }
-
-
     }
 }
